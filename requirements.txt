@@ -1,0 +1,5 @@
+attrs
+bs4
+requests
+sqlalchemy
+urlpath
