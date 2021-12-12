@@ -12,14 +12,27 @@ from urlpath import URL
 
 import re
 
+# @todo check logging
+# @todo users
+# @todo type to int
 
 Base = declarative_base()
+
+class User(Base):
+    __tablename__ = 'user'
+
+    avatar: str = Column(String)
+    current_name: str = Column(String, nullable=False)
+    group: str = Column(String)
+    id: int = Column(Integer, primary_key=True)
+    joined: int = Column(Integer)
+    signature: str = Column(String)
 
 class Lottery(Base):
     __tablename__ = 'lottery'
 
     id: int = Column(Integer, primary_key=True)
-    tickets: int = Column(Integer)
+    tickets: int = Column(Integer, nullable=False)
     type: int = Column(Integer, primary_key=True)
 
 class LotteryItem(Base):
@@ -29,11 +42,11 @@ class LotteryItem(Base):
     )
 
     id: int = Column(Integer, primary_key=True)
-    item: str = Column(String)
+    item: str = Column(String, nullable=False)
     place: int = Column(Integer, primary_key=True)
-    quantity: int = Column(Integer)
+    quantity: int = Column(Integer, nullable=False)
     type: int = Column(Integer, primary_key=True)
-    winner: str = Column(String)
+    winner: str = Column(String, nullable=False)
 
 class LotteryType(Enum):
     WEAPON = str(paths.HV_LOTTO_WEAPON)
@@ -89,7 +102,7 @@ def parse_lotto_items(id: int, type: LotteryType, page: BeautifulSoup) -> list[L
         item = texts[2*i + 1]
         winner = texts[2*i + 2]
 
-        name,quantity = item.split(' ', maxsplit=1)
+        quantity, name = item.split(' ', maxsplit=1)
         conslation_prize = LotteryItem(id=id, type=type_id, item=name, place=i+1, quantity=quantity, winner=winner)
         prizes.append(conslation_prize)
     
