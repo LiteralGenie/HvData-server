@@ -1,6 +1,7 @@
 from . import Base
 
 from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
 
 
 class User(Base):
@@ -12,3 +13,6 @@ class User(Base):
     id: int = Column(Integer, primary_key=True)
     joined: int = Column(Integer)
     signature: str = Column(String)
+
+# class NameChange(Base):
+#     pass

@@ -1,31 +1,78 @@
+from errors import NoResultsError
 from hvpytils import HvSession
 from ..models.lottery import Lottery, LotteryItem, LotteryType
+from ..models.user import User
+from .user_parser import UserParser
 
 from bs4 import BeautifulSoup
 from sqlalchemy.orm import Session
 from typing import Tuple
 from urlpath import URL
 
-import re
+import logging, re
 
-# @todo separate parsing from creation?
+logger = logging.getLogger('LotteryParser')
 
 
 class LotteryParser:
+    def __init__(self, session: HvSession) -> None:
+        self.uninitialized_users: dict[str, LotteryItem] = dict()
+        self.session = session
+
+    def fetch_partial(self, type: LotteryType, id: int):
+        """
+        Returns a Lottery and the corresponding LotteryItem's
+        The LotteryItem's are **not** fully initialized. Please remember to call intialize_winners() after all fetch_partial's are completed.
+        """
+
+        lotto, items, winners = self._fetch_partial(type, id, self.session)
+        for item,user in zip(items,winners):
+            self.uninitialized_users.setdefault(user, []).append(item)
+        
+        return lotto
+
     @classmethod
-    def fetch(cls, type: LotteryType, id: int, session: HvSession) -> Tuple[Lottery, LotteryItem]:
+    def _fetch_partial(cls, type: LotteryType, id: int, session: HvSession) -> Tuple[Lottery, list[LotteryItem], list[str]]:
         page = cls.fetch_page(type=type, id=id, session=session)
 
         lotto = cls._parse_lotto(page)
         lotto.id = id
         lotto.type = type
 
-        items = cls._parse_lotto_items(page)
+        items,winners = cls._parse_lotto_items(page)
         for it in items:
             it.id = id
             it.type = type
+            it.lottery = lotto
 
-            # get / assign user
+        return lotto, items, winners
+
+    def initialize_winners(self):
+        """
+        Initialize winners on each item. 
+        This function is isolated from fetch_partial in order to reduce the number of requests by taking advantage of repeated winners.
+        """
+
+        user_map: dict[str, User] = dict()
+        for ign in self.uninitialized_users.keys():
+            if ign not in user_map:
+                try:
+                    user = UserParser.from_search(ign, self.session)
+                    user_map[ign] = user
+                except NoResultsError:
+                    user_map[ign] = None
+        
+        for ign, item_lst in self.uninitialized_users.items():
+            if user_map[ign] is not None:
+                for item in item_lst:
+                    item.winner = user_map[ign]
+            else:
+                strings = [f'{item.quantity}x {item.item}' for item in item_lst]
+                logger.error(f'Could not link user [{ign}] to items [{", ".join(strings)}]')
+
+        self.uninitialized_users = dict()
+
+        return self
 
     @classmethod
     def get_latest(cls, type: LotteryType, session: HvSession) -> Tuple[BeautifulSoup, int]:
@@ -58,11 +105,6 @@ class LotteryParser:
         m = re.search(r'You hold \d+ of (\d+) sold tickets.', text)
         tickets = m.group(1)
 
-        if type is LotteryType.WEAPON:
-            type_id = 0
-        else:
-            type_id = 1
-
         return Lottery(tickets=tickets)
 
     @classmethod
@@ -78,16 +120,19 @@ class LotteryParser:
         divs = page.select('#leftpane > div:nth-child(4) > div')
         assert len(divs) == 9, f'Expected 9 divs but found {len(divs)}'
 
-        texts = [x.text.split(': ') for x in divs]
+        texts = [x.text for x in divs]
+        assert all(':' in x for x in texts), f'Missing colons in lottery text, maybe you\'re trying to parse the latest lottery? {texts}'
+        texts = [x.split(': ') for x in texts]
         texts = [x[1] for x in texts]
 
         # grand prize
-        equip = LotteryItem(item=equip_name, place=0, quantity=1, winner=texts[0])
+        equip = LotteryItem(item=equip_name, place=0, quantity=1)
         prizes.append(equip)
+        raw_winners.append(texts[0])
 
         # consolation prizes
         items = [texts[2*i + 1] for i in range(4)]
-        raw_winners = [texts[2*i + 2] for i in range(4)]
+        raw_winners.extend(texts[2*i + 2] for i in range(4))
 
         for i,it in enumerate(items):
             quantity, name = it.split(' ', maxsplit=1)
@@ -96,28 +141,4 @@ class LotteryParser:
         
         # return
         return prizes, raw_winners
-
-
-
-from ..models import Base
-from sqlalchemy import create_engine
-
-hv_session = HvSession(user='frotag', pw='A1S2d3f4')
-hv_session.login()
-
-db = create_engine("sqlite:///sanity.sqlite", echo=True)
-Base.metadata.create_all(db)
-
-with Session(db) as db_session:
-    with db_session.begin():
-        _, newest_id = get_latest_lotto(LotteryType.WEAPON, hv_session)
-        
-        soup = fetch_lotto_page(LotteryType.WEAPON, newest_id-1, hv_session)
-        lotto = parse_lotto(newest_id-1, LotteryType.WEAPON, soup)
-        items = parse_lotto_items(newest_id-1, LotteryType.WEAPON, soup)
-
-        db_session.add(lotto)
-        [db_session.add(x) for x in items]
-
-resp,id = get_latest_lotto(LotteryType.WEAPON, hv_session)
-pass
+    
