@@ -1,7 +1,6 @@
 from . import Base
 
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Float, Integer, String
 
 
 class User(Base):
@@ -11,7 +10,7 @@ class User(Base):
     current_name: str = Column(String, nullable=False)
     group: str = Column(String)
     id: int = Column(Integer, primary_key=True)
-    joined: int = Column(Integer)
+    joined: float = Column(Float)
     signature: str = Column(String)
 
 # class NameChange(Base):

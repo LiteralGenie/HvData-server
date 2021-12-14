@@ -1,5 +1,5 @@
-from errors import NoResultsError
 from hvpytils import HvSession
+from ..errors import NoResultsError
 from ..models.lottery import Lottery, LotteryItem, LotteryType
 from ..models.user import User
 from .user_parser import UserParser

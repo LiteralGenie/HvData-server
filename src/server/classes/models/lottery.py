@@ -19,8 +19,9 @@ class Lottery(Base):
     __tablename__ = 'lottery'
 
     id: int = Column(Integer, primary_key=True)
-    tickets: int = Column(Integer, nullable=False)
     type: LotteryType = Column(sqlalchemy.Enum(LotteryType), primary_key=True)
+
+    tickets: int = Column(Integer, nullable=False)
 
     items = relationship('LotteryItem', back_populates='lottery')
     
@@ -32,11 +33,13 @@ class LotteryItem(Base):
     )
 
     id: int = Column(Integer, primary_key=True)
+    type: LotteryType = Column(sqlalchemy.Enum(LotteryType), primary_key=True) 
+
     item: str = Column(String, nullable=False)
     place: int = Column(Integer, primary_key=True)
     quantity: int = Column(Integer, nullable=False)
-    type: LotteryType = Column(sqlalchemy.Enum(LotteryType), primary_key=True) 
+
     winner_id: User = Column(Integer, ForeignKey('user.id'), nullable=False)
+    winner = relationship('User', backref='lottery_items')
 
     lottery = relationship('Lottery', back_populates='items')
-    winner = relationship('User', backref='lottery_items')

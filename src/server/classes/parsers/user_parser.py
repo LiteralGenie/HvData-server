@@ -1,5 +1,5 @@
 from config import paths
-from errors import NoResultsError
+from ..errors import NoResultsError
 from hvpytils.classes.hv_session import HvSession
 from ..models.user import User
 
