@@ -1,8 +1,7 @@
 from . import Base
-from .equip import Equip
 from .user import User
 
-from sqlalchemy import Column, Float, ForeignKey, ForeignKeyConstraint, Integer, String
+from sqlalchemy import Column, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 
@@ -16,25 +15,21 @@ class SuperAuction(Base):
 
 class SuperAuctionItem(Base):
     __tablename__ = 'super_auction_item'
-    __table_args__ = (
-        # composite foreign keys need to be at least this ugly
-        ForeignKeyConstraint(['id', 'type'], [Equip.id, Equip.key]),
-    )
 
     auction: SuperAuction = Column(SuperAuction, ForeignKey('super_auction.id'), primary_key=True)
-    cat: str = Column(String, primary_key=True)
+    category: str = Column(String, primary_key=True)
     number: int = Column(Integer, primary_key=True)
-    
+
     description: str = Column(String)
     name: str = Column(String, nullable=False)
     price: int = Column(Integer, nullable=False)
 
+    equip_id: int = Column(Integer, ForeignKey('equip.id'))
+    equip_key: int = Column(Integer, ForeignKey('equip.id'))
     item_name: str = Column(String)
     item_quantity: int = Column(Integer)
-    
-    equip_id: int = Column(Integer, ForeignKey('equip.id'))
 
-    buyer_raw: str = Column(String, nullable=False)
+    buyer_raw: str = Column(String)
     buyer_id: int = Column(Integer, ForeignKey('user.id'))
     buyer: User = relationship('User', backref='super_auction_buys')
 

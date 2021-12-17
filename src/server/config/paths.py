@@ -17,5 +17,10 @@ HV_LOTTO_WEAPON = HV_BAZAAR.add_query(ss='lt')
 HV_LOTTO_ARMOR = HV_BAZAAR.add_query(ss='la')
 
 
-# eh urls
+# other urls
 FORUM_ROOT = URL('https://forums.e-hentai.org/index.php')
+SUPER_ROOT = URL('https://reasoningtheory.net')
+
+SUPER_LIST = SUPER_ROOT / 'itemlist'
+SUPER_LOG = SUPER_ROOT / 'bidlog'
+SUPER_TIMES = SUPER_ROOT / 'bidtimes'

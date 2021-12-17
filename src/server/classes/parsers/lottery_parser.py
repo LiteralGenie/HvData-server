@@ -5,8 +5,6 @@ from ..models.user import User
 from .user_parser import UserParser
 
 from bs4 import BeautifulSoup
-from sqlalchemy.orm import Session
-from typing import Tuple
 from urlpath import URL
 
 import logging, re
@@ -32,7 +30,7 @@ class LotteryParser:
         return lotto
 
     @classmethod
-    def _fetch_partial(cls, type: LotteryType, id: int, session: HvSession) -> Tuple[Lottery, list[LotteryItem], list[str]]:
+    def _fetch_partial(cls, type: LotteryType, id: int, session: HvSession) -> tuple[Lottery, list[LotteryItem], list[str]]:
         page = cls.fetch_page(type=type, id=id, session=session)
 
         lotto = cls._parse_lotto(page)
@@ -75,7 +73,7 @@ class LotteryParser:
         return self
 
     @classmethod
-    def get_latest(cls, type: LotteryType, session: HvSession) -> Tuple[BeautifulSoup, int]:
+    def get_latest(cls, type: LotteryType, session: HvSession) -> tuple[BeautifulSoup, int]:
         """Get (html,id) for current lottery"""
 
         page = session.get(type.value)
@@ -108,7 +106,7 @@ class LotteryParser:
         return Lottery(tickets=tickets)
 
     @classmethod
-    def _parse_lotto_items(cls, page: BeautifulSoup) -> Tuple[list[LotteryItem], list[str]]:
+    def _parse_lotto_items(cls, page: BeautifulSoup) -> tuple[list[LotteryItem], list[str]]:
         """Return partially intialized list of LotteryItem's"""
 
         prizes = []

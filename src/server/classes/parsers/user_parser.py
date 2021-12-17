@@ -2,11 +2,12 @@ from config import paths
 from ..errors import NoResultsError
 from hvpytils.classes.hv_session import HvSession
 from ..models.user import User
+from utils.date_utils import utc_date_to_timestamp
 
 from bs4 import BeautifulSoup
 from urlpath import URL
 
-import base64, calendar, datetime, re, requests
+import base64, re, requests
 
 
 class UserParser:
@@ -77,16 +78,9 @@ class UserParser:
 
     @classmethod
     def _parse_joined_date(cls, text: str) -> int:
-        # @todo generic date to timestamp
         m = re.search(r'(\d+)-(\w+) (\d+)', text)
-        day = int(m.group(1))
         month = cls._month_to_int(m.group(2))
-        year = int(m.group(3))
-
-        date = datetime.datetime(year=year, month=month, day=day)
-        ts = calendar.timegm(date.timetuple())
-        
-        return ts
+        return utc_date_to_timestamp(m.group(3), month, m.group(1))
 
     @classmethod
     def _month_to_int(cls, month: str):

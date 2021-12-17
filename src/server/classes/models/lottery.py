@@ -8,8 +8,6 @@ from sqlalchemy.orm import relationship
 import enum, sqlalchemy
 
 # @todo check logging
-# @todo users
-# @todo type to int
 
 class LotteryType(enum.Enum):
     WEAPON = str(paths.HV_LOTTO_WEAPON)
