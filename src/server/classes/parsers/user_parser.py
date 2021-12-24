@@ -7,7 +7,7 @@ from utils.date_utils import utc_date_to_timestamp
 from bs4 import BeautifulSoup
 from urlpath import URL
 
-import base64, re, requests
+import base64, re, requests, time
 
 
 class UserParser:
@@ -17,6 +17,7 @@ class UserParser:
         
         user = cls._parse_profile_page(page)
         user.id = id
+        user.last_fetch_profile = time.time()
 
         return user
 
@@ -41,7 +42,12 @@ class UserParser:
             profile_link = URL(cells[0].select_one('a')['href'])
             id = int(profile_link.form.get_one('showuser'))
 
-            return User(current_name=name, group=group, id=id, joined=joined)
+            return User(current_name=name, group=group, id=id, joined=joined, last_fetch_profile=time.time())
+
+    # @todo
+    @classmethod
+    def from_post(cls):
+        pass
 
     @classmethod
     def fetch_page(cls, id: int, session: HvSession) -> BeautifulSoup:
