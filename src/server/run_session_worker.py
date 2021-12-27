@@ -23,14 +23,12 @@ login_info = HvCookies(
 )
 session = HvSession(cookies=login_info)
 session.login()
-resp = session.get(session.HV_LINK)
 
-with Listener(env.session_address, authkey=secrets.hv_session.authkey) as listener:
-    with listener.accept() as conn:
-        while True:
+with Listener(env.hv_session.address, authkey=secrets.hv_session.authkey) as listener:
+    while True:
+        with listener.accept() as conn:
             req: Request = conn.recv()
+            print('worker got request', (req.method, req.url), req)
             # @todo log source
-            
             resp = session.send(req)
-
             conn.send(resp)

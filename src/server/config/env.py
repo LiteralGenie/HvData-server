@@ -1,1 +1,2 @@
-session_address = ('localhost', 7922)
+class hv_session:
+    address = ('localhost', 7922)
