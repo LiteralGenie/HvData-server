@@ -1,4 +1,4 @@
-from config import env, paths, secrets
+from config import env, secrets
 from hvpytils import HvSession, HvCookies
 
 from multiprocessing.connection import Listener
