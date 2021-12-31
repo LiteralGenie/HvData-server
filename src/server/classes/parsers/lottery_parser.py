@@ -13,7 +13,7 @@ logger = logging.getLogger('LotteryParser')
 
 
 class LotteryParser:
-    def __init__(self, session: HvSession) -> None:
+    def __init__(self, session: HvSession):
         self.uninitialized_users: dict[str, LotteryItem] = dict()
         self.session = session
 
@@ -139,4 +139,3 @@ class LotteryParser:
         
         # return
         return prizes, raw_winners
-    

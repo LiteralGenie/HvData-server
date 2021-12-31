@@ -9,7 +9,7 @@ import logging
 # @todo error handling
 
 
-LOG = logging.getLogger('HvSession')
+LOG = logging.getLogger('SessionWorker')
 LOG.setLevel(logging.DEBUG)
 
 handler = logging.StreamHandler()
@@ -28,7 +28,7 @@ with Listener(env.hv_session.address, authkey=secrets.hv_session.authkey) as lis
     while True:
         with listener.accept() as conn:
             req: Request = conn.recv()
-            print('worker got request', (req.method, req.url), req)
+            LOG.info('worker got request', (req.method, req.url), req)
             # @todo log source
             resp = session.send(req)
             conn.send(resp)
