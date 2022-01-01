@@ -1,15 +1,13 @@
 from . import Base
+from .uuid_mixin import UuidMixin
 
 from sqlalchemy import Column, Float, Integer, String
 
-import uuid
 
-
-class User(Base):
+class User(UuidMixin, Base):
     __tablename__ = 'user'
 
     id: int = Column(Integer, primary_key=True)
-    uuid: str = Column(String, default=lambda: str(uuid.uuid4()))
 
     avatar: str = Column(String)
     current_name: str = Column(String, nullable=False)

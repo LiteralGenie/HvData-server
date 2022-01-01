@@ -30,6 +30,8 @@ class Fetcher:
                 lotto = self.lotto_parser.fetch_one(type=type, id=id)
                 self.lotto_parser.initialize_winners()
                 session.merge(lotto)
+                session.flush()
+                session.commit()
             else:
                 session.expunge_all()
 

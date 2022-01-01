@@ -107,7 +107,7 @@ class LotteryParser:
 
         text = page.select_one('#rightpane > div:nth-child(5)').text
         m = re.search(r'You hold \d+ of (\d+) sold tickets.', text)
-        tickets = m.group(1)
+        tickets = int(m.group(1))
 
         return Lottery(tickets=tickets)
 

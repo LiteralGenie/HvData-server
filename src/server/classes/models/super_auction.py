@@ -1,13 +1,12 @@
 from . import Base
 from .user import User
+from .uuid_mixin import UuidMixin
 
 from sqlalchemy import Column, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-import uuid
 
-
-class SuperAuction(Base):
+class SuperAuction(Base, UuidMixin):
     __tablename__ = 'super_auction'
     
     id: int = Column(Integer, primary_key=True)
@@ -15,12 +14,11 @@ class SuperAuction(Base):
     end_date: Float = Column(Float, nullable=False)
     number: str = Column(String, nullable=False)
 
-class SuperAuctionItem(Base):
+class SuperAuctionItem(Base, UuidMixin):
     __tablename__ = 'super_auction_item'
 
     auction_id: int = Column(Integer, ForeignKey('super_auction.id'), primary_key=True)
     auction = relationship('SuperAuction', backref='items')
-    uuid: str = Column(String, default=lambda: str(uuid.uuid4()))
 
     category: str = Column(String, primary_key=True)
     number: int = Column(Integer, primary_key=True)

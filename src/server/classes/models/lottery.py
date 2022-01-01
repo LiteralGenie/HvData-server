@@ -1,6 +1,7 @@
 from . import Base
 from config import paths
 from .user import User
+from .uuid_mixin import UuidMixin
 
 from sqlalchemy import Column, ForeignKey, ForeignKeyConstraint, Integer, String
 from sqlalchemy.orm import relationship
@@ -12,18 +13,17 @@ class LotteryType(enum.Enum):
     WEAPON = str(paths.HV_LOTTO_WEAPON)
     ARMOR = str(paths.HV_LOTTO_ARMOR)
 
-class Lottery(Base):
+class Lottery(Base, UuidMixin):
     __tablename__ = 'lottery'
 
     id: int = Column(Integer, primary_key=True)
     type: LotteryType = Column(sqlalchemy.Enum(LotteryType), primary_key=True)
-    uuid: str = Column(String, default=lambda: str(uuid.uuid4()))
 
     tickets: int = Column(Integer, nullable=False)
 
     items = relationship('LotteryItem', back_populates='lottery')
     
-class LotteryItem(Base):
+class LotteryItem(Base, UuidMixin):
     __tablename__ = 'lottery_item'
     __table_args__ = (
         # composite foreign keys need to be at least this ugly
@@ -31,7 +31,7 @@ class LotteryItem(Base):
     )
 
     id: int = Column(Integer, primary_key=True)
-    type: LotteryType = Column(sqlalchemy.Enum(LotteryType), primary_key=True) 
+    type: LotteryType = Column(sqlalchemy.Enum(LotteryType), primary_key=True)
 
     name: str = Column(String, nullable=False)
     place: int = Column(Integer, primary_key=True)
