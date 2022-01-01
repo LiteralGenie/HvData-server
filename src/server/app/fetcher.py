@@ -2,10 +2,10 @@ from classes.parsers import LotteryParser, SuperParser, UserParser
 from classes.models import Equip, Lottery, SuperAuction
 from classes.models import LotteryItem, LotteryType
 
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session, subqueryload
 
-import attr
+import attr, time
 
 
 def serialize(model):
@@ -33,6 +33,13 @@ class Fetcher:
             else:
                 session.expunge_all()
 
-            print(type, lotto.type)
-
         return lotto
+
+    def lottery_latest(self, type: LotteryType):
+        seconds_elapsed = time.time() - LotteryParser.START_DATES[type]
+        days_elapsed = seconds_elapsed // 86400
+                
+        return dict(
+            id = 1+days_elapsed,
+            start = LotteryParser.START_DATES[type] + days_elapsed*86400
+        )

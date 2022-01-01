@@ -2,11 +2,14 @@ from . import Base
 
 from sqlalchemy import Column, Float, Integer, String
 
+import uuid
+
 
 class User(Base):
     __tablename__ = 'user'
 
     id: int = Column(Integer, primary_key=True)
+    uuid: str = Column(String, default=lambda: str(uuid.uuid4()))
 
     avatar: str = Column(String)
     current_name: str = Column(String, nullable=False)

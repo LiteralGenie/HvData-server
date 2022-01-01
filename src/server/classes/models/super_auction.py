@@ -4,6 +4,8 @@ from .user import User
 from sqlalchemy import Column, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
+import uuid
+
 
 class SuperAuction(Base):
     __tablename__ = 'super_auction'
@@ -18,6 +20,7 @@ class SuperAuctionItem(Base):
 
     auction_id: int = Column(Integer, ForeignKey('super_auction.id'), primary_key=True)
     auction = relationship('SuperAuction', backref='items')
+    uuid: str = Column(String, default=lambda: str(uuid.uuid4()))
 
     category: str = Column(String, primary_key=True)
     number: int = Column(Integer, primary_key=True)

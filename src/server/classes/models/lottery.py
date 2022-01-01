@@ -5,7 +5,7 @@ from .user import User
 from sqlalchemy import Column, ForeignKey, ForeignKeyConstraint, Integer, String
 from sqlalchemy.orm import relationship
 
-import attr, enum, sqlalchemy
+import enum, sqlalchemy, uuid
 
 
 class LotteryType(enum.Enum):
@@ -17,6 +17,7 @@ class Lottery(Base):
 
     id: int = Column(Integer, primary_key=True)
     type: LotteryType = Column(sqlalchemy.Enum(LotteryType), primary_key=True)
+    uuid: str = Column(String, default=lambda: str(uuid.uuid4()))
 
     tickets: int = Column(Integer, nullable=False)
 

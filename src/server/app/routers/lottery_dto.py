@@ -1,4 +1,5 @@
 from classes.models import Lottery, LotteryItem, LotteryType, User
+from classes.parsers import LotteryParser
 from . import _roll
 
 from enum import Enum
@@ -15,7 +16,7 @@ class LotteryTypeDto(str, Enum):
 
 class LotteryUserDto(BaseModel):
     name: str
-    id: Optional[int]
+    uuid: Optional[int]
 
     @classmethod
     def serialize(cls, user: User):
@@ -24,7 +25,7 @@ class LotteryUserDto(BaseModel):
         else:
             return dict(
                 name = user.current_name,
-                id = user.id
+                uuid = user.uuid
             )
 
 class LotteryItemDto(BaseModel):
@@ -38,7 +39,7 @@ class LotteryItemDto(BaseModel):
         if it.winner:
             winner = LotteryUserDto.serialize(it.winner)
         else:
-            winner = dict(name=it.raw_winner, id=None)
+            winner = dict(name=it.raw_winner, uuid=it.uuid)
 
         return dict(
             name = it.name,
@@ -62,10 +63,13 @@ class LotteryDto(BaseModel):
             items = [LotteryItemDto.serialize(x) for x in l.items]
         ))
 
+class LatestLotteryDto(BaseModel):
+    id: int
+    start: int
 
-def _get_sample(grand_prize='grand prize'):
+def _sample_lotto(grand_prize='grand prize'):
     users = _roll.users()
-    ids = random.choices(list(range(1, 10**7)), k=5)
+    uuids = random.choices(list(range(1, 10**7)), k=5)
 
     return dict(
         id=random.randint(1,10000),
@@ -76,31 +80,31 @@ def _get_sample(grand_prize='grand prize'):
                 name=grand_prize,
                 place=0,
                 quantity=1,
-                winner=dict(name='프레이', id=ids.pop())
+                winner=dict(name='프레이', uuid=uuids.pop())
             ),
             dict(
                 name='Golden Lottery Tickets',
                 place=1,
                 quantity=4,
-                winner=dict(name=users.pop(), id=None)
+                winner=dict(name=users.pop(), uuid=uuids.pop())
             ),
             dict(
                 name='Caffeinated Candies',
                 place=2,
                 quantity=16,
-                winner=dict(name=users.pop(), id=ids.pop())
+                winner=dict(name=users.pop(), uuid=uuids.pop())
             ),
             dict(
                 name='Chaos Tokens',
                 place=3,
                 quantity=160,
-                winner=dict(name=users.pop(), id=ids.pop())
+                winner=dict(name=users.pop(), uuid=uuids.pop())
             ),
             dict(
                 name='Chaos Tokens',
                 place=4,
                 quantity=160,
-                winner=dict(name=users.pop(), id=ids.pop())
+                winner=dict(name=users.pop(), uuid=uuids.pop())
             )
         ]
     )
@@ -113,8 +117,8 @@ class examples:
                 'application/json': {
                     'examples': {
                         '1': {
-                            'value':{
-                                **_get_sample(grand_prize='Peerless Hallowed Oak Staff of Heimdall'),
+                            'value': {
+                                **_sample_lotto(grand_prize='Peerless Hallowed Oak Staff of Heimdall'),
                                 'type': LotteryTypeDto.WEAPON
                             }
                         }
@@ -135,8 +139,8 @@ class examples:
                 'application/json': {
                     'examples': {
                         '1': {
-                            'value':{
-                                **_get_sample(grand_prize='Peerless Mystic Phase Robe of Fenrir'),
+                            'value': {
+                                **_sample_lotto(grand_prize='Peerless Mystic Phase Robe of Fenrir'),
                                 'type': LotteryTypeDto.ARMOR
                             }
                         }
@@ -147,5 +151,43 @@ class examples:
 
         422: {
             'description': 'Invalid Lottery Id'
+        }
+    }
+
+    get_latest_armor = {
+        200: {
+            'description': 'Success',
+            'content': {
+                'application/json': {
+                    'examples': {
+                        '1': {
+                            'description': 'The first armor lottery started at 1396094400s epoch time.',
+                            'value': dict(
+                                id = 101,
+                                start = LotteryParser.START_DATES[LotteryType.ARMOR] + 100*86400
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    get_latest_weapon = {
+        200: {
+            'description': 'Success',
+            'content': {
+                'application/json': {
+                    'examples': {
+                        '1': {
+                            'description': 'The first weapon lottery started at 1379116800s epoch time.',
+                            'value': dict(
+                                id = 101,
+                                start = LotteryParser.START_DATES[LotteryType.WEAPON] + 100*86400
+                            )
+                        }
+                    }
+                }
+            }
         }
     }

@@ -13,6 +13,12 @@ logger = logging.getLogger('LotteryParser')
 
 
 class LotteryParser:
+    # timestamps for when the first lottos started
+    START_DATES = {
+        LotteryType.ARMOR: 1396094400,
+        LotteryType.WEAPON: 1379116800
+    }
+
     def __init__(self, session: HvSession):
         self.uninitialized_users: dict[str, LotteryItem] = dict()
         self.session = session
@@ -140,3 +146,7 @@ class LotteryParser:
         
         # return
         return prizes, raw_winners
+
+    @classmethod
+    def get_start(cls, id: int, type: LotteryType) -> float:
+        return cls.START_DATES[type] + 86400*(id-1)
