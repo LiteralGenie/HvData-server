@@ -16,19 +16,21 @@ handler = logging.StreamHandler()
 handler.setLevel(logging.DEBUG)
 LOG.addHandler(handler)
 
+logging.getLogger('HvSession').addHandler(handler)
+logging.getLogger('HvSession').setLevel(logging.DEBUG)
+
 
 login_info = HvCookies(
     ipb_member_id=secrets.hv_session.ipb_member_id, 
     ipb_pass_hash=secrets.hv_session.ipb_pass_hash
 )
 session = HvSession(cookies=login_info)
-session.login()
 
 with Listener(env.hv_session.address, authkey=secrets.hv_session.authkey) as listener:
     while True:
         with listener.accept() as conn:
-            req: Request = conn.recv()
-            LOG.info('worker got request', (req.method, req.url), req)
+            kwargs = conn.recv()
+            LOG.info(f'worker got request: {kwargs["method"], kwargs["url"]}')
             # @todo log source
-            resp = session.send(req)
+            resp = session.send(**kwargs)
             conn.send(resp)

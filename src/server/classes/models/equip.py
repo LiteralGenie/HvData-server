@@ -17,7 +17,7 @@ class Equip(Base):
     key: str = Column(String, primary_key=True)
 
     last_updated: float = Column(Float, nullable=False)
-    owner: str = Column(str)
+    owner: str = Column(String)
     tradable: bool = Column(Boolean, nullable=False)
     type: str = Column(String, nullable=False)
 

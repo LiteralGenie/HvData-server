@@ -1,1 +1,1 @@
-from .client_session import ClientSession
+from .proxy_session import ProxySession

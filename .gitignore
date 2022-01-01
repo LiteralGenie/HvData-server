@@ -1,4 +1,7 @@
 *.pyc
 env.py
+hvdata.sqlite
 secrets.py
+
+hvpytils
 venv

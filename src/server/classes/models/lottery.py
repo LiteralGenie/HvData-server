@@ -5,9 +5,8 @@ from .user import User
 from sqlalchemy import Column, ForeignKey, ForeignKeyConstraint, Integer, String
 from sqlalchemy.orm import relationship
 
-import enum, sqlalchemy
+import attr, enum, sqlalchemy
 
-# @todo check logging
 
 class LotteryType(enum.Enum):
     WEAPON = str(paths.HV_LOTTO_WEAPON)
@@ -33,11 +32,12 @@ class LotteryItem(Base):
     id: int = Column(Integer, primary_key=True)
     type: LotteryType = Column(sqlalchemy.Enum(LotteryType), primary_key=True) 
 
-    item: str = Column(String, nullable=False)
+    name: str = Column(String, nullable=False)
     place: int = Column(Integer, primary_key=True)
     quantity: int = Column(Integer, nullable=False)
 
-    winner_id: User = Column(Integer, ForeignKey('user.id'), nullable=False)
-    winner = relationship('User', backref='lottery_items')
+    raw_winner: str = Column(String, nullable=False)
+    winner_id: User = Column(Integer, ForeignKey('user.id'))
+    winner: User = relationship('User', backref='lottery_items')
 
-    lottery = relationship('Lottery', back_populates='items')
+    lottery: Lottery = relationship('Lottery', back_populates='items')

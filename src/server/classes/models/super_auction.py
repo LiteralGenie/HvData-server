@@ -16,7 +16,9 @@ class SuperAuction(Base):
 class SuperAuctionItem(Base):
     __tablename__ = 'super_auction_item'
 
-    auction: SuperAuction = Column(SuperAuction, ForeignKey('super_auction.id'), primary_key=True)
+    auction_id: int = Column(Integer, ForeignKey('super_auction.id'), primary_key=True)
+    auction = relationship('SuperAuction', backref='items')
+
     category: str = Column(String, primary_key=True)
     number: int = Column(Integer, primary_key=True)
 
@@ -31,8 +33,8 @@ class SuperAuctionItem(Base):
 
     buyer_raw: str = Column(String)
     buyer_id: int = Column(Integer, ForeignKey('user.id'))
-    buyer: User = relationship('User', backref='super_auction_buys')
+    buyer: User = relationship('User', backref='super_auction_buys', foreign_keys=[buyer_id])
 
     seller_raw: str = Column(String, nullable=False)
     seller_id: int = Column(Integer, ForeignKey('user.id'))
-    seller: User = relationship('User', backref='super_auction_sells')
+    seller: User = relationship('User', backref='super_auction_sells', foreign_keys=[seller_id])
