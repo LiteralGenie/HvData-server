@@ -43,7 +43,7 @@ class LotteryParser:
         lotto.id = id
         lotto.type = type
 
-        items,winners = cls._parse_lotto_items(page)
+        items, winners = cls._parse_lotto_items(page)
         for it in items:
             it.id = id
             it.type = type

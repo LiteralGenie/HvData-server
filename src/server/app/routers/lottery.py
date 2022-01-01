@@ -7,7 +7,8 @@ from fastapi import APIRouter, HTTPException, Request
 
 
 router = APIRouter(
-    prefix='/lottery'
+    prefix='/lottery',
+    tags=['Lottery']
 )
 
 @router.get('/armor/latest', response_model=LatestLotteryDto, responses=examples.get_latest_armor)
@@ -16,7 +17,7 @@ def _(request: Request):
     latest = fetcher.lottery_latest(type=LotteryType.ARMOR)
     return latest
 
-@router.get('/weapon/latest', response_model=LatestLotteryDto, responses=examples.get_latest_armor)
+@router.get('/weapon/latest', response_model=LatestLotteryDto, responses=examples.get_latest_weapon)
 def _(request: Request):
     fetcher: Fetcher = request.app.state.db_fetcher
     latest = fetcher.lottery_latest(type=LotteryType.WEAPON)

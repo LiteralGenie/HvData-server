@@ -4,6 +4,7 @@ from classes.parsers import LotteryParser, SuperParser, UserParser
 from config import env, paths, secrets
 from .fetcher import Fetcher
 from .routers.lottery import router as LotteryRouter
+from .routers.super import router as SuperRouter
 
 from fastapi import FastAPI
 from sqlalchemy.orm import sessionmaker
@@ -12,6 +13,7 @@ from sqlalchemy.engine import create_engine
 
 app = FastAPI(debug=True)
 app.include_router(LotteryRouter)
+app.include_router(SuperRouter)
 
 @app.on_event('startup')
 async def on_startup():
