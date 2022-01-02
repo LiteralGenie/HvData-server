@@ -16,7 +16,7 @@ class LotteryTypeDto(str, Enum):
 
 class LotteryUserDto(BaseModel):
     name: str
-    uuid: Optional[int]
+    id: Optional[int]
 
     @classmethod
     def serialize(cls, user: User):
@@ -25,7 +25,7 @@ class LotteryUserDto(BaseModel):
         else:
             return dict(
                 name = user.current_name,
-                uuid = user.uuid
+                id = user.id
             )
 
 class LotteryItemDto(BaseModel):
@@ -39,7 +39,7 @@ class LotteryItemDto(BaseModel):
         if it.winner:
             winner = LotteryUserDto.serialize(it.winner)
         else:
-            winner = dict(name=it.raw_winner, uuid=it.uuid)
+            winner = dict(name=it.raw_winner)
 
         return dict(
             name = it.name,

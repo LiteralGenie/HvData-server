@@ -28,9 +28,15 @@ session = HvSession(cookies=login_info)
 
 with Listener(env.hv_session.address, authkey=secrets.hv_session.authkey) as listener:
     while True:
-        with listener.accept() as conn:
-            kwargs = conn.recv()
-            LOG.info(f'worker got request: {kwargs["method"], kwargs["url"]}')
-            # @todo log source
-            resp = session.send(**kwargs)
-            conn.send(resp)
+        try:
+            with listener.accept() as conn:
+                LOG.debug('Connection started.')
+                kwargs = conn.recv()
+                
+                LOG.info(f'Received {kwargs}')
+                resp = session.send(**kwargs)
+
+                conn.send(resp)
+                LOG.debug('Connection ended.')
+        except ConnectionResetError:
+            LOG.info(f'Connection reset.')

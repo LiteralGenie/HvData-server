@@ -34,7 +34,7 @@ class LotteryFetcher:
 
     def lottery_latest(self, type: LotteryType):
         seconds_elapsed = time.time() - LotteryParser.START_DATES[type]
-        days_elapsed = seconds_elapsed // 86400
+        days_elapsed = int(seconds_elapsed // 86400)
                 
         return dict(
             id = 1+days_elapsed,

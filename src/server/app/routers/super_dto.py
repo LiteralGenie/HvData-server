@@ -12,7 +12,7 @@ import random
 
 class SuperAuctionUserDto(BaseModel):
     name: str
-    uuid: str
+    id: Optional[int]
 
     @classmethod
     def serialize(cls, user: User):
@@ -21,7 +21,7 @@ class SuperAuctionUserDto(BaseModel):
         else:
             return dict(
                 name = user.current_name,
-                uuid = user.uuid
+                id = user.id
             )
 
 class SuperAuctionItemDto(BaseModel):
@@ -45,14 +45,14 @@ class SuperAuctionItemDto(BaseModel):
             buyer = SuperAuctionUserDto.serialize(it.buyer)
         else:
             if it.buyer_raw:
-                buyer = dict(name=it.buyer_raw, uuid=it.uuid + '_b')
+                buyer = dict(name=it.buyer_raw)
             else:
                 buyer = None
 
         if it.seller:
             seller = SuperAuctionUserDto.serialize(it.seller)
         else:
-            seller = dict(name=it.seller_raw, uuid=it.uuid + '_s')
+            seller = dict(name=it.seller_raw)
         
         return dict(
             category = it.category,

@@ -81,8 +81,9 @@ class UserParser:
 
     def _parse_joined_date(self, text: str) -> int:
         m = re.search(r'(\d+)-(\w+) (\d+)', text)
+        year = int(m.group(3)) + 2000
         month = self._month_to_int(m.group(2))
-        return utc_date_to_timestamp(m.group(3), month, m.group(1))
+        return utc_date_to_timestamp(year, month, m.group(1))
 
     def _month_to_int(self, month: str):
         months = [

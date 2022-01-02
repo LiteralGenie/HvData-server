@@ -9,7 +9,7 @@ from urlpath import URL
 
 import logging, re
 
-logger = logging.getLogger('LotteryParser')
+LOG = logging.getLogger('LotteryParser')
 
 
 class LotteryParser:
@@ -58,7 +58,9 @@ class LotteryParser:
         """
 
         user_map: dict[str, User] = dict()
-        for ign in self.uninitialized_users.keys():
+        keys = sorted(list(self.uninitialized_users.keys()))
+        LOG.debug(f'Initializing users {user_map}')
+        for ign in keys:
             if ign not in user_map:
                 try:
                     user = UserParser(session=self.session).from_search(ign)
@@ -72,10 +74,11 @@ class LotteryParser:
                     item.winner = user_map[ign]
             else:
                 strings = [f'{item.quantity}x {item.name}' for item in item_lst]
-                logger.error(f'Could not link user [{ign}] to items [{", ".join(strings)}]')
+                LOG.error(f'Could not link user [{ign}] to items [{", ".join(strings)}]')
 
-        self.uninitialized_users = dict()
-
+        for k in keys:
+            del self.uninitialized_users[k]
+            
         return self
 
     @classmethod
@@ -141,7 +144,7 @@ class LotteryParser:
 
         for i,it in enumerate(items):
             quantity, name = it.split(' ', maxsplit=1)
-            conslation_prize = LotteryItem(name=name, place=i+1, quantity=int(quantity), raw_winner=raw_winners[i])
+            conslation_prize = LotteryItem(name=name, place=i+1, quantity=int(quantity), raw_winner=raw_winners[i+1])
             prizes.append(conslation_prize)
         
         # return
