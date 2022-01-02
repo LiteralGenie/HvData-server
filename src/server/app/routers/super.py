@@ -12,7 +12,7 @@ router = APIRouter(
     tags=["Auctions (superlatanium)"]
 )
 
-@router.get('/latest', response_model=SuperAuctionDto, response_model_exclude={'items'})
+@router.get('/list', response_model=SuperAuctionDto, response_model_exclude={'items'})
 def _(request: Request):
     fetcher: Fetcher = request.app.state.db_fetcher
     with fetcher.super_list() as aucs:

@@ -74,20 +74,18 @@ class SuperAuctionDto(BaseModel):
     id: int
     end_date: float
     number: str
-    items: list[SuperAuctionItemDto]
+    items: Optional[list[SuperAuctionItemDto]]
 
     @classmethod
     def serialize(cls, auc: SuperAuction, wrap_response=True, include_items=True):
-        items = []
-        if include_items:
-            items = [SuperAuctionItemDto.serialize(x) for x in auc.items]
-
         result = dict(
             id = auc.id,
             end_date = auc.end_date,
-            number = auc.number,
-            items = items
+            number = auc.number
         )
+
+        if include_items:
+            result['items'] = [SuperAuctionItemDto.serialize(x) for x in auc.items]
 
         if wrap_response:
             result = JSONResponse(content=result)

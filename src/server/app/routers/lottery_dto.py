@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import Optional
 
-import random
+import random, uuid
 
 
 class LotteryTypeDto(str, Enum):
@@ -69,7 +69,7 @@ class LatestLotteryDto(BaseModel):
 
 def _sample_lotto(grand_prize='grand prize'):
     users = _roll.users()
-    uuids = random.choices(list(range(1, 10**7)), k=5)
+    uuids = [uuid.uuid4() for i in range(5)]
 
     return dict(
         id=random.randint(1,10000),
