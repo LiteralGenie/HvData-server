@@ -2,7 +2,7 @@ from classes.proxy_session import ProxySession
 from classes.models import Base
 from classes.parsers import LotteryParser, SuperParser, UserParser
 from config import env, paths, secrets
-from .fetcher import Fetcher
+from .fetchers import Fetcher
 from .routers.lottery import router as LotteryRouter
 from .routers.super import router as SuperRouter
 

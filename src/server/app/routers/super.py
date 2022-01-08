@@ -1,6 +1,6 @@
 from classes import errors
 from classes.models import SuperAuction, SuperAuctionItem
-from ..fetcher import Fetcher
+from ..fetchers import Fetcher
 from .super_dto import examples, SuperAuctionDto
 
 from fastapi import APIRouter, HTTPException, Request

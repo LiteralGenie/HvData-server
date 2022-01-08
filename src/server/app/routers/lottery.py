@@ -1,6 +1,6 @@
 from classes import errors
 from classes.models import Lottery, LotteryItem, LotteryType
-from ..fetcher import Fetcher
+from ..fetchers import Fetcher
 from .lottery_dto import examples, LotteryDto, LatestLotteryDto
 
 from fastapi import APIRouter, HTTPException, Request

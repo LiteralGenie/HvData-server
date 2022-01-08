@@ -86,7 +86,6 @@ class SuperParser:
     def _parse_row(self, tds: list[BeautifulSoup]):
         item = SuperAuctionItem()
 
-        print('desc', tds[2])
         item.category, item.number = self._parse_code(tds[0].text)
         item.description = tds[2].text
         item.seller_raw = tds[5].text
