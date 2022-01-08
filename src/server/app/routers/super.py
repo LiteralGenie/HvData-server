@@ -1,7 +1,7 @@
 from classes import errors
 from classes.models import SuperAuction, SuperAuctionItem
 from ..fetcher import Fetcher
-from .super_dto import SuperAuctionDto
+from .super_dto import examples, SuperAuctionDto
 
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
@@ -12,7 +12,7 @@ router = APIRouter(
     tags=["Auctions (superlatanium)"]
 )
 
-@router.get('/list', response_model=SuperAuctionDto, response_model_exclude={'items'})
+@router.get('/list', response_model=SuperAuctionDto, responses=examples.get_auction_list)
 def _(request: Request):
     fetcher: Fetcher = request.app.state.db_fetcher
     with fetcher.super_list() as aucs:
@@ -22,7 +22,7 @@ def _(request: Request):
         ]
         return JSONResponse(content=resp)
 
-@router.get('/{id}', response_model=SuperAuctionDto)
+@router.get('/{id}', response_model=SuperAuctionDto, responses=examples.get_auction)
 def _(id: int, request: Request):
     fetcher: Fetcher = request.app.state.db_fetcher
     auc = fetcher.super_auction(id=id)

@@ -74,7 +74,7 @@ class SuperAuctionDto(BaseModel):
     id: int
     end_date: float
     number: str
-    items: Optional[list[SuperAuctionItemDto]]
+    items: list[SuperAuctionItemDto]
 
     @classmethod
     def serialize(cls, auc: SuperAuction, wrap_response=True, include_items=True):
@@ -92,127 +92,172 @@ class SuperAuctionDto(BaseModel):
 
         return result
 
-# def _sample_lotto(grand_prize='grand prize'):
-#     users = _roll.users()
-#     uuids = random.choices(list(range(1, 10**7)), k=5)
+def _sample_item():
+    users = _roll.users()
 
-#     return dict(
-#         id=random.randint(1,10000),
-#         type=LotteryTypeDto.WEAPON,
-#         tickets=random.randint(10**4, 10**8),
-#         items=[
-#             dict(
-#                 name=grand_prize,
-#                 place=0,
-#                 quantity=1,
-#                 winner=dict(name='프레이', uuid=uuids.pop())
-#             ),
-#             dict(
-#                 name='Golden Lottery Tickets',
-#                 place=1,
-#                 quantity=4,
-#                 winner=dict(name=users.pop(), uuid=uuids.pop())
-#             ),
-#             dict(
-#                 name='Caffeinated Candies',
-#                 place=2,
-#                 quantity=16,
-#                 winner=dict(name=users.pop(), uuid=uuids.pop())
-#             ),
-#             dict(
-#                 name='Chaos Tokens',
-#                 place=3,
-#                 quantity=160,
-#                 winner=dict(name=users.pop(), uuid=uuids.pop())
-#             ),
-#             dict(
-#                 name='Chaos Tokens',
-#                 place=4,
-#                 quantity=160,
-#                 winner=dict(name=users.pop(), uuid=uuids.pop())
-#             )
-#         ]
-#     )
+    buyer = random.choice([
+        None,
+        dict(name=users.pop(), id=random.randint(1,10000))
+    ])
+    
+    seller = dict(
+        name=users.pop(),
+        id=random.randint(1,10000)
+    )
 
-# class examples:
-#     get_weapon = {
-#         200: {
-#             'description': 'Success',
-#             'content': {
-#                 'application/json': {
-#                     'examples': {
-#                         '1': {
-#                             'value': {
-#                                 **_sample_lotto(grand_prize='Peerless Hallowed Oak Staff of Heimdall'),
-#                                 'type': LotteryTypeDto.WEAPON
-#                             }
-#                         }
-#                     }
-#                 }
-#             }
-#         },
+    def _sample_mat():
+        name = random.choice([
+            'High-Grade Cloth',
+            'Binding of Slaughter',
+            'Energy Drink',
+            'Amnesia Shard',
+            'Low-Grade Wood',
+            'Binding of the Barrier',
+            'Binding of Friendship',
+            'Happy Pills'
+        ])
+    
+        quantity = random.randint(1,100) * 10**random.randint(0,3)
 
-#         422: {
-#             'description': 'Invalid Lottery Id'
-#         }
-#     }
+        if buyer:
+            price = random.randint(50, 10000) # in thousands
 
-#     get_armor = {
-#         200: {
-#             'description': 'Success',
-#             'content': {
-#                 'application/json': {
-#                     'examples': {
-#                         '1': {
-#                             'value': {
-#                                 **_sample_lotto(grand_prize='Peerless Mystic Phase Robe of Fenrir'),
-#                                 'type': LotteryTypeDto.ARMOR
-#                             }
-#                         }
-#                     }
-#                 }
-#             }
-#         },
+            per_unit = price / quantity
+            if per_unit < 1:
+                description = f'{int(per_unit*1000)}c'
+            else:
+                description = f'{int(per_unit*10)/10}k'
+        else:
+            price = 0
+            description = ''
 
-#         422: {
-#             'description': 'Invalid Lottery Id'
-#         }
-#     }
+        return dict(
+            category='mat',
+            number=random.randint(1,99),
+            
+            name=name,
+            description=description,
+            price=price*1000,
+            quantity=quantity,
 
-#     get_latest_armor = {
-#         200: {
-#             'description': 'Success',
-#             'content': {
-#                 'application/json': {
-#                     'examples': {
-#                         '1': {
-#                             'description': 'The first armor lottery started at 1396094400s epoch time.',
-#                             'value': dict(
-#                                 id = 101,
-#                                 start = LotteryParser.START_DATES[LotteryType.ARMOR] + 100*86400
-#                             )
-#                         }
-#                     }
-#                 }
-#             }
-#         }
-#     }
+            buyer=buyer,
+            seller=seller
+        )
 
-#     get_latest_weapon = {
-#         200: {
-#             'description': 'Success',
-#             'content': {
-#                 'application/json': {
-#                     'examples': {
-#                         '1': {
-#                             'description': 'The first weapon lottery started at 1379116800s epoch time.',
-#                             'value': dict(
-#                                 id = 101,
-#                                 start = LotteryParser.START_DATES[LotteryType.WEAPON] + 100*86400
-#                             )
-#                         }
-#                     }
-#                 }
-#             }
-#         }
-#     }
+    def _sample_equip():
+        prefix = random.sample(['Legendary', 'Peerless'], k=1, counts=[50,1])[0]
+
+        name = prefix + ' ' + random.choice([
+            'Charged Phase Shoes of Niflheim',
+            'Onyx Phase Pants of Surtr',
+            'Savage Power Armor of Balance',
+            'Hallowed Oak Staff of Heimdall',
+            'Fiery Redwood Staff of Surtr',
+            'Onyx Shade Leggings of the Shadowdancer',
+            'Arctic Rapier of Slaughter',
+            'Hallowed Katana of Slaughter',
+            'Arctic Redwood Staff of Niflheim',
+            'Zircon Power Gauntlets of Protection',
+            'Tempestuous Willow Staff of Destruction',
+            'Ruby Power Boots of Warding',
+            'Jade Force Shield of Dampening',
+            'Ethereal Rapier of Slaughter'
+        ])
+
+        description = random.choice([
+            '500, ADB 46%',
+            '333, Wind EDB 15%',
+            '415, ADB 93%',
+            '492, ADB 3%',
+            '385, Forb Prof 25%',
+            '385, ADB 52%',
+            '398, ADB 100%',
+            '439, Holy EDB 59%',
+            '354, ADB 91%',
+            '475, Divine Prof 101%',
+            '500, Elem Prof 97%',
+            '331, Str Dex Agi, BLK 59%',
+            '452, IW 10, ADB 59%',
+            '458, MDB 55%, Cold EDB 47%',
+            '482, ADB 79%',
+            '421, Elem Prof 68%',
+            '341, ADB 88%',
+            '400, Elec EDB 40%',
+            '422, Dark EDB 92%',
+        ])
+
+        return dict(
+            category = random.choice(['one','two','sta','shd','clo','lig','hea']),
+            number=random.randint(1,99),
+            
+            name=name,
+            description=description,
+            price=random.randint(50,80000)*1000 if buyer else 0,
+            quantity=1,
+            
+            equip_id=random.randint(10**4, 10**8),
+            equip_key=hex(random.randint(68719476736, 1099511627775))[2:], # (10 0000 0000)_16 to (FF FFFF FFFF)_16
+
+            buyer=buyer,
+            seller=seller
+        )
+
+    return random.choice([
+        _sample_mat(),
+        _sample_equip()
+    ])
+
+def _sample_auction(num_items=0):
+    number = f'{random.randint(11,200)}{random.sample(["", ".5"], k=1, counts=[2,1])[0]}'
+
+    return dict(
+        id=random.randint(1,1000),
+        end_date=random.random()*(10**9) + 10**9,
+        number=number,
+        items=[_sample_item() for i in range(num_items)]
+    )
+
+class examples:
+    get_auction_list = {
+        200: {
+            'description': 'Success',
+            'content': {
+                'application/json': {
+                    'examples': {
+                        '1': {
+                            'value': [
+                                _sample_auction()
+                                for i in range(7)
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+
+        422: {
+            'description': 'Invalid Auction Id'
+        }
+    }
+
+    get_auction = {
+        200: {
+            'description': 'Success',
+            'content': {
+                'application/json': {
+                    'examples': {
+                        '1': {
+                            'description': 'Do not assume the item description is populated with any consistency, especially for mats.',
+                            'value': {
+                                **_sample_auction(num_items=random.randint(10,20))
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        422: {
+            'description': 'Invalid Auction Id'
+        }
+    }
